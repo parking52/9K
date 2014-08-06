@@ -1,0 +1,38 @@
+CC  = gcc
+LDFLAGS = -g
+CFLAGS  = -Wall -pedantic -ansi -ggdb
+
+
+#JEU	= texte
+JEU	= graphique
+
+ifeq ($(JEU),texte)
+  SDLFLAGS  = -lncurses
+	SRCS = Leonidas.c Ennemi.c Map.c Jeu.c ncursJeu.c main.c
+	FINAL_TARGET = 9K_txt
+	DEFINE = -DJEU_NCURSES
+else
+  SDLFLAGS  = `sdl-config --cflags --libs`  -lSDLmain -lSDL -lSDL_ttf -lfmodex
+	SRCS = Leonidas.c Ennemi.c Map.c Jeu.c sdlJeu.c main.c
+	FINAL_TARGET = 9K_gfx
+	DEFINE = -DJEU_SDL
+endif
+
+OBJ = $(SRCS:.c=.o)
+VPATH = ../src
+
+all : $(FINAL_TARGET)
+
+$(FINAL_TARGET) : $(OBJ)
+				$(CC) -o $@ $^ $(LDFLAGS) $(SDLFLAGS)
+								
+%.o: %.c
+				$(CC) -o $@ -c $< $(CFLAGS) $(DEFINE)
+				
+.PHONY : clean mrproper
+
+clean :
+				rm -f 9K_txt 9K_gfx *.o
+
+mrproper :  clean
+				rm $(EXEC)
